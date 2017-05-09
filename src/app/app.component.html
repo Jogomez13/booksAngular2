@@ -1,3 +1,76 @@
 <h1>
   {{title}}
 </h1>
+
+<table>
+  <thead>
+  <tr>
+    <th>Titre</th>
+    <th>Auteur</th>
+    <th>Prix</th>
+    <th>Quantité</th>
+    <th>Montant</th>
+    <th></th>
+  </tr>
+  </thead>
+  <tbody>
+
+  <tr *ngFor="let row of rows"
+  [class.big]="isBig(row)">
+    <td>{{row.title}}</td>
+    <td>{{row.author}}</td>
+    <td class="right">{{row.price | currency:'EUR':true }}</td>
+    <td class="right"><input type ="number" [(ngModel)]="row.quantity">
+    </td>
+    <td class="right">{{row.amount() | currency:'EUR':true }}</td>
+    <td><button (click)="remove(row)">Supprimer</button></td>
+  </tr>
+  </tbody>
+  <tfoot>
+  <tr>
+    <td colspan="4">Total</td>
+    <td class="right">{{total() | currency:'EUR':true }}</td>
+    <td></td>
+  </tr>
+  </tfoot>
+</table>
+
+<h2>Ajout (<input type ="checkbox"
+[(ngModel)]="manualMode">en mode manuel)</h2>
+
+<form (ngSubmit)="manualAdd()" #formInfo="ngForm"
+*ngIf="manualMode">
+  <label>Titre    <input type="text" name="title"
+                         [(ngModel)]="manualFormData.title"
+  required></label>
+  <label>Auteur   <input type="text" name="author"
+                         [(ngModel)]="manualFormData.author"
+    required></label>
+  <label>Prix     <input type="number" name="price"
+                         [(ngModel)]="manualFormData.price"
+    required></label>
+  <label>Quantité <input type="number" name="quantity"
+                         [(ngModel)]="manualFormData.quantity"
+    required></label>
+  <input type="submit" value="Ajouter"
+         [disabled]="formInfo.invalid">
+</form>
+
+<h2>Ajout depuis le catalogue</h2>
+<form (ngSubmit)="catalogAdd()"
+*ngIf="!manualMode">
+  <label>Livre<select name="selected"
+  [(ngModel)]="catalogFormData.selected">
+    <option *ngFor="let book of books$ | async"
+    [ngValue]="book">
+{{book.title}}
+    </option>
+
+  </select></label>
+  <label>Quantité <input type="number" name="quantity"
+                                        [(ngModel)]="catalogFormData.quantity">
+  </label>
+  <input type="submit" value="Ajouter">
+</form>
+
+<pre>{{books$ | async | json}}</pre>
